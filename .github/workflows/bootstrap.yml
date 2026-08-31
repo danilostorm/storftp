@@ -24,6 +24,7 @@ jobs:
           cat .bootstrap/part* | base64 -d > /tmp/storftp.tar.gz
           tar -xzf /tmp/storftp.tar.gz
           rm -rf .bootstrap
+          rm -f .github/workflows/ci.yml
           rm -f .github/workflows/bootstrap.yml
 
       - name: Commit complete StorFTP implementation
