@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release-build-v0.1.0
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-22.04
+            artifact_name: storftp-linux
+            bundle_args: --bundles deb,appimage
+            artifact_paths: |
+              src-tauri/target/release/bundle/deb/*.deb
+              src-tauri/target/release/bundle/appimage/*.AppImage
+          - name: Windows
+            os: windows-latest
+            artifact_name: storftp-windows
+            bundle_args: --bundles nsis
+            artifact_paths: |
+              src-tauri/target/release/bundle/nsis/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf build-essential pkg-config libssl-dev libfuse2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build release bundles
+        run: npm run tauri build -- ${{ matrix.bundle_args }}
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_paths }}
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release bundles
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Show release files
+        run: find release-assets -maxdepth 2 -type f -print
+
+      - name: Publish v0.1.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(release-assets/*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo 'No release files were produced.' >&2
+            exit 1
+          fi
+
+          if gh release view v0.1.0 >/dev/null 2>&1; then
+            gh release upload v0.1.0 "${files[@]}" --clobber
+          else
+            gh release create v0.1.0 "${files[@]}" \
+              --target "$GITHUB_SHA" \
+              --title 'StorFTP v0.1.0' \
+              --notes $'Primeira release pública do StorFTP.\n\nInclui:\n- Windows x64: instalador NSIS (.exe)\n- Linux x64: pacote Debian/Ubuntu/Zorin (.deb)\n- Linux x64: AppImage portátil\n- FTP, FTPES, FTPS, SFTP, sistema local e Google Drive\n- Gerenciador de transferências, fila, retomada, histórico e verificação de checksum\n- Builds validados por CI em Windows e Ubuntu'
+          fi
