@@ -75,8 +75,17 @@ jobs:
           path: release-assets
           merge-multiple: true
 
-      - name: Show release files
-        run: find release-assets -maxdepth 2 -type f -print
+      - name: Collect release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf publish-assets
+          mkdir -p publish-assets
+          while IFS= read -r -d '' file; do
+            cp "$file" "publish-assets/$(basename "$file")"
+          done < <(find release-assets -type f -print0)
+          echo 'Release files:'
+          find publish-assets -maxdepth 1 -type f -print
 
       - name: Publish v0.1.0
         env:
@@ -85,7 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           shopt -s nullglob
-          files=(release-assets/*)
+          files=(publish-assets/*)
           if [ ${#files[@]} -eq 0 ]; then
             echo 'No release files were produced.' >&2
             exit 1
