@@ -37,18 +37,34 @@ const ICON_PNG: &[u8] = &[
     0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ];
 
-fn ensure_icon() {
+fn windows_ico() -> Vec<u8> {
+    let mut ico = Vec::with_capacity(22 + ICON_PNG.len());
+    ico.extend_from_slice(&[0, 0, 1, 0, 1, 0]);
+    ico.extend_from_slice(&[64, 64, 0, 0]);
+    ico.extend_from_slice(&1u16.to_le_bytes());
+    ico.extend_from_slice(&32u16.to_le_bytes());
+    ico.extend_from_slice(&(ICON_PNG.len() as u32).to_le_bytes());
+    ico.extend_from_slice(&22u32.to_le_bytes());
+    ico.extend_from_slice(ICON_PNG);
+    ico
+}
+
+fn ensure_icons() {
     let root = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR missing"));
     let icons_dir = root.join("icons");
-    let icon = icons_dir.join("icon.png");
+    let png = icons_dir.join("icon.png");
+    let ico = icons_dir.join("icon.ico");
 
     fs::create_dir_all(&icons_dir).expect("failed to create Tauri icons directory");
-    if !icon.exists() {
-        fs::write(&icon, ICON_PNG).expect("failed to generate Tauri icon.png");
+    if !png.exists() {
+        fs::write(&png, ICON_PNG).expect("failed to generate Tauri icon.png");
+    }
+    if !ico.exists() {
+        fs::write(&ico, windows_ico()).expect("failed to generate Tauri icon.ico");
     }
 }
 
 fn main() {
-    ensure_icon();
+    ensure_icons();
     tauri_build::build()
 }
