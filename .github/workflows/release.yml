@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - release-build-v0.1.0
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
