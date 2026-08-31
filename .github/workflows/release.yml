@@ -2,8 +2,6 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -90,6 +88,7 @@ jobs:
       - name: Publish v0.1.0
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
