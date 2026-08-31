@@ -28,7 +28,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [],
+    "icon": ["icons/icon.png", "icons/icon.ico"],
     "category": "Utility",
     "shortDescription": "Universal File Transfer & Cloud Manager",
     "longDescription": "Modern FTP, FTPS, SFTP, local filesystem and Google Drive manager with intelligent transfer strategies."
