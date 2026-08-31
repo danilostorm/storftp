@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "StorFTP",
+  "version": "0.1.0",
+  "identifier": "cloud.hoststorm.storftp",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "StorFTP",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 960,
+        "minHeight": 650,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline'; connect-src ipc: http://ipc.localhost https://www.googleapis.com https://oauth2.googleapis.com https://accounts.google.com"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Utility",
+    "shortDescription": "Universal File Transfer & Cloud Manager",
+    "longDescription": "Modern FTP, FTPS, SFTP, local filesystem and Google Drive manager with intelligent transfer strategies."
+  }
+}

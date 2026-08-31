@@ -1,0 +1,44 @@
+[package]
+name = "storftp"
+version = "0.1.0"
+description = "StorFTP - Universal File Transfer & Cloud Manager"
+authors = ["DaniloStorm"]
+edition = "2021"
+rust-version = "1.77.2"
+license = "MIT"
+repository = "https://github.com/danilostorm/storftp"
+default-run = "storftp"
+
+[lib]
+name = "storftp_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2" }
+
+[dependencies]
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+crossbeam-channel = "0.5"
+dirs = "6"
+keyring = "3"
+parking_lot = "0.12"
+rand = "0.9"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+rusqlite = { version = "0.32", features = ["bundled", "chrono"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+ssh2 = { version = "0.9", features = ["vendored-openssl"] }
+suppaftp = { version = "10", features = ["native-tls", "deprecated"] }
+tauri = { version = "2" }
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+url = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+walkdir = "2"
+
+[dev-dependencies]
+tempfile = "3"
