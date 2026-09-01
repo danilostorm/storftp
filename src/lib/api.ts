@@ -1,7 +1,26 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { AppSettings, CapabilitySet, ConnectionProfile, FileEntry, ProviderRef, TransferJob } from "../types";
 
-export interface SftpHostProbe { host: string; port: number; fingerprint: string }
+export interface SftpHostProbe {
+  host: string;
+  port: number;
+  fingerprint: string;
+}
+
+export interface ConnectionTestResult {
+  ok: boolean;
+  protocol: string;
+  message: string;
+  latencyMs: number;
+  authMethod?: string | null;
+}
+
+export interface ImportReport {
+  imported: ConnectionProfile[];
+  skipped: number;
+  warnings: string[];
+  sources: string[];
+}
 
 export const api = {
   homeDirectory: () => invoke<string>("home_directory"),
@@ -11,6 +30,9 @@ export const api = {
   saveConnection: (profile: ConnectionProfile, secret?: string | null) =>
     invoke<ConnectionProfile>("save_connection", { profile, secret: secret ?? null }),
   deleteConnection: (id: string) => invoke<void>("delete_connection", { id }),
+  testConnection: (profile: ConnectionProfile, secret?: string | null) =>
+    invoke<ConnectionTestResult>("test_connection", { profile, secret: secret ?? null }),
+  importConnections: () => invoke<ImportReport>("import_connections"),
   createDirectory: (provider: ProviderRef, path: string) => invoke<void>("create_directory", { provider, path }),
   deleteEntry: (provider: ProviderRef, path: string, recursive = false) =>
     invoke<void>("delete_entry", { provider, path, recursive }),
@@ -24,6 +46,7 @@ export const api = {
   resumeTransfer: (id: string) => invoke<void>("resume_transfer", { id }),
   settings: () => invoke<AppSettings>("get_settings"),
   saveSettings: (settings: AppSettings) => invoke<AppSettings>("save_settings", { settings }),
+  probeSftpProfile: (profile: ConnectionProfile) => invoke<SftpHostProbe>("probe_sftp_profile", { profile }),
   probeSftpHost: (id: string) => invoke<SftpHostProbe>("probe_sftp_host", { id }),
   trustSftpHost: (id: string, fingerprint: string) => invoke<ConnectionProfile>("trust_sftp_host", { id, fingerprint }),
   googleOAuth: (connectionName: string, clientId: string, clientSecret: string) =>
