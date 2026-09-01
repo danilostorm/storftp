@@ -1,6 +1,6 @@
 [package]
 name = "storftp"
-version = "0.1.0"
+version = "0.1.1"
 description = "StorFTP - Universal File Transfer & Cloud Manager"
 authors = ["DaniloStorm"]
 edition = "2021"
