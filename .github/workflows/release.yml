@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -11,6 +13,7 @@ permissions:
 
 jobs:
   build:
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.event.head_commit.message, 'release:')
     name: Build ${{ matrix.name }}
     strategy:
       fail-fast: false
@@ -67,6 +70,21 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve release tag
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            tag="$GITHUB_REF_NAME"
+          else
+            version=$(python3 -c "import json; print(json.load(open('package.json'))['version'])")
+            tag="v${version}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
       - name: Download release bundles
         uses: actions/download-artifact@v4
         with:
@@ -85,10 +103,11 @@ jobs:
           echo 'Release files:'
           find publish-assets -maxdepth 1 -type f -print
 
-      - name: Publish v0.1.0
+      - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
         shell: bash
         run: |
           set -euo pipefail
@@ -99,11 +118,11 @@ jobs:
             exit 1
           fi
 
-          if gh release view v0.1.0 >/dev/null 2>&1; then
-            gh release upload v0.1.0 "${files[@]}" --clobber
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${files[@]}" --clobber
           else
-            gh release create v0.1.0 "${files[@]}" \
+            gh release create "$RELEASE_TAG" "${files[@]}" \
               --target "$GITHUB_SHA" \
-              --title 'StorFTP v0.1.0' \
-              --notes $'Primeira release pública do StorFTP.\n\nInclui:\n- Windows x64: instalador NSIS (.exe)\n- Linux x64: pacote Debian/Ubuntu/Zorin (.deb)\n- Linux x64: AppImage portátil\n- FTP, FTPES, FTPS, SFTP, sistema local e Google Drive\n- Gerenciador de transferências, fila, retomada, histórico e verificação de checksum\n- Builds validados por CI em Windows e Ubuntu'
+              --title "StorFTP $RELEASE_TAG" \
+              --generate-notes
           fi
