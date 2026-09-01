@@ -22,6 +22,25 @@ export interface ImportReport {
   sources: string[];
 }
 
+export function errorMessage(error: unknown): string {
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object") {
+    const value = error as { message?: unknown; technical?: unknown };
+    if (typeof value.message === "string" && value.message.trim()) {
+      return value.message;
+    }
+    if (typeof value.technical === "string" && value.technical.trim()) {
+      return value.technical;
+    }
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return "Erro desconhecido";
+    }
+  }
+  return String(error ?? "Erro desconhecido");
+}
+
 export const api = {
   homeDirectory: () => invoke<string>("home_directory"),
   list: (provider: ProviderRef, path: string) => invoke<FileEntry[]>("list_entries", { provider, path }),

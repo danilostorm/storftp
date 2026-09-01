@@ -51,6 +51,12 @@ export function App() {
     try { await api.enqueueTransfer(sourceProvider, rightProvider, sourcePath, join(destinationPath, basename(sourcePath))); await loadTransfers(); } catch (e) { console.error(e); }
   };
 
+  const connectProfile = (profile: ConnectionProfile, target: "left" | "right") => {
+    const provider: ProviderRef = { kind: profile.kind, connectionId: profile.id };
+    if (target === "left") setLeftProvider(provider);
+    else setRightProvider(provider);
+  };
+
   return <div className="app-shell">
     <header className="topbar">
       <div className="brand"><div className="brand-mark"><Zap size={20} /></div><div><strong>StorFTP</strong><span>Universal File Transfer & Cloud Manager</span></div></div>
@@ -65,14 +71,14 @@ export function App() {
 
     <main className="workspace">
       <div className="panes">
-        <FilePane title="ORIGEM / PAINEL A" provider={leftProvider} connections={connections} initialPath={homePath} onProviderChange={setLeftProvider} onDropEntry={onLeftDrop} />
+        <FilePane title="ORIGEM / PAINEL A" provider={leftProvider} connections={connections} initialPath={homePath} onProviderChange={setLeftProvider} onConnectionChanged={loadConnections} onDropEntry={onLeftDrop} />
         <div className="pane-divider"><Zap size={14} /></div>
-        <FilePane title="DESTINO / PAINEL B" provider={rightProvider} connections={connections} initialPath={homePath} onProviderChange={setRightProvider} onDropEntry={onRightDrop} />
+        <FilePane title="DESTINO / PAINEL B" provider={rightProvider} connections={connections} initialPath={homePath} onProviderChange={setRightProvider} onConnectionChanged={loadConnections} onDropEntry={onRightDrop} />
       </div>
       <TransferPanel transfers={transfers} onCancel={(id) => void api.cancelTransfer(id).then(loadTransfers)} onRetry={(id) => void api.retryTransfer(id).then(loadTransfers)} onPause={(id) => void api.pauseTransfer(id).then(loadTransfers)} onResume={(id) => void api.resumeTransfer(id).then(loadTransfers)} />
     </main>
 
-    {connectionOpen && <ConnectionManager connections={connections} onClose={() => setConnectionOpen(false)} onChanged={loadConnections} />}
+    {connectionOpen && <ConnectionManager connections={connections} onClose={() => setConnectionOpen(false)} onChanged={loadConnections} onConnect={connectProfile} />}
     {settingsOpen && <SettingsModal settings={settings} onClose={() => setSettingsOpen(false)} onSaved={setSettings} />}
     {googleOpen && <GoogleDriveModal onClose={() => setGoogleOpen(false)} onConnected={loadConnections} />}
   </div>;

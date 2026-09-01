@@ -1,0 +1,128 @@
+.connect-target {
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.connect-target > span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 650;
+}
+.connect-target > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.connect-target button {
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+}
+.connect-target button.active {
+  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.fingerprint-card {
+  margin-top: 14px;
+  padding: 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+  display: grid;
+  gap: 9px;
+}
+.fingerprint-card.warning,
+.pane-fingerprint.warning {
+  border-color: color-mix(in srgb, var(--warning) 50%, var(--border));
+  background: color-mix(in srgb, var(--warning) 7%, var(--surface));
+}
+.fingerprint-card.ok,
+.pane-fingerprint.ok {
+  border-color: color-mix(in srgb, var(--success) 45%, var(--border));
+  background: color-mix(in srgb, var(--success) 6%, var(--surface));
+}
+.fingerprint-card.danger,
+.pane-fingerprint.danger {
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--border));
+  background: color-mix(in srgb, var(--danger) 7%, var(--surface));
+}
+.fingerprint-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+}
+.fingerprint-title svg { color: var(--accent); }
+.fingerprint-card.warning .fingerprint-title svg { color: var(--warning); }
+.fingerprint-card.ok .fingerprint-title svg { color: var(--success); }
+.fingerprint-card.danger .fingerprint-title svg { color: var(--danger); }
+.fingerprint-lines {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 9.5px;
+}
+.fingerprint-lines code,
+.pane-fingerprint code {
+  color: var(--accent-2);
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.fingerprint-error,
+.fingerprint-danger { color: var(--danger); }
+
+.pane-fingerprint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10px;
+}
+.pane-fingerprint > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.pane-fingerprint > div > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+.pane-fingerprint.warning > div > svg { color: var(--warning); }
+.pane-fingerprint.ok > div > svg { color: var(--success); }
+.pane-fingerprint.danger > div > svg { color: var(--danger); }
+.pane-fingerprint span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.pane-fingerprint strong { color: var(--text); }
+.pane-fingerprint small { color: var(--muted); }
+.pane-fingerprint code { font-size: 9px; }
+
+.connection-tools {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+@media (max-width: 1120px) {
+  .pane-fingerprint {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pane-fingerprint .secondary-button { align-self: flex-start; }
+}
